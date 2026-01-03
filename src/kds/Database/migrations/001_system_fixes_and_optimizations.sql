@@ -40,6 +40,26 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
   COMMENT='Login attempt tracking for rate limiting and security';
 
 -- ----------------------------------------------------------------------------
+-- Table: pos_cash_movements (POS feature: Cash movement tracking)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `pos_cash_movements` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `store_id` INT UNSIGNED NOT NULL COMMENT 'FK: kds_stores.id',
+  `shift_id` BIGINT UNSIGNED NULL COMMENT 'FK: pos_shifts.id (NULL if outside shift)',
+  `user_id` INT UNSIGNED NOT NULL COMMENT 'FK: kds_users.id',
+  `movement_type` ENUM('ADD', 'REMOVE', 'ADJUST') NOT NULL COMMENT 'ADD=加钞, REMOVE=取钞, ADJUST=调整',
+  `amount` DECIMAL(10,2) NOT NULL COMMENT 'Amount (positive for ADD, negative for REMOVE)',
+  `reason` VARCHAR(255) NOT NULL COMMENT 'Reason for movement',
+  `notes` TEXT NULL COMMENT 'Additional notes',
+  `created_at` DATETIME(6) NOT NULL DEFAULT (UTC_TIMESTAMP(6)),
+
+  INDEX `idx_store_shift` (`store_id`, `shift_id`),
+  INDEX `idx_user` (`user_id`),
+  INDEX `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='POS cash movements (add/remove/adjust cash from register)';
+
+-- ----------------------------------------------------------------------------
 -- Table: password_reset_tokens (New feature: Password reset)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
@@ -209,6 +229,24 @@ ALTER TABLE `kds_material_translations`
   FOREIGN KEY (`material_id`) REFERENCES `kds_materials`(`id`)
   ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- ----------------------------------------------------------------------------
+-- pos_cash_movements
+-- ----------------------------------------------------------------------------
+ALTER TABLE `pos_cash_movements`
+  ADD CONSTRAINT `fk_cash_movement_store`
+  FOREIGN KEY (`store_id`) REFERENCES `kds_stores`(`id`)
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `pos_cash_movements`
+  ADD CONSTRAINT `fk_cash_movement_shift`
+  FOREIGN KEY (`shift_id`) REFERENCES `pos_shifts`(`id`)
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `pos_cash_movements`
+  ADD CONSTRAINT `fk_cash_movement_user`
+  FOREIGN KEY (`user_id`) REFERENCES `kds_users`(`id`)
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
 -- ============================================================================
 -- PART 4: DATA CLEANUP (Optional - Review before running)
 -- ============================================================================
@@ -260,6 +298,9 @@ WHERE CONSTRAINT_SCHEMA = 'mhdlmskv3gjbpqv3'
 
 /*
 -- Drop foreign keys (run in reverse order)
+ALTER TABLE `pos_cash_movements` DROP FOREIGN KEY `fk_cash_movement_user`;
+ALTER TABLE `pos_cash_movements` DROP FOREIGN KEY `fk_cash_movement_shift`;
+ALTER TABLE `pos_cash_movements` DROP FOREIGN KEY `fk_cash_movement_store`;
 ALTER TABLE `kds_material_translations` DROP FOREIGN KEY `fk_material_trans_material`;
 ALTER TABLE `kds_product_translations` DROP FOREIGN KEY `fk_product_trans_product`;
 ALTER TABLE `kds_recipe_adjustments` DROP FOREIGN KEY `fk_adjustment_unit`;
@@ -275,6 +316,7 @@ ALTER TABLE `kds_users` DROP FOREIGN KEY `fk_users_store`;
 
 -- Drop new tables
 DROP TABLE IF EXISTS `password_reset_tokens`;
+DROP TABLE IF EXISTS `pos_cash_movements`;
 DROP TABLE IF EXISTS `login_attempts`;
 
 -- Drop indexes

@@ -32,7 +32,12 @@
 // [GEMINI FIX 2025-11-16] 修复致命路径错误，从 4 个 '..' 改为 3 个
 require_once realpath(__DIR__ . '/../../pos_backend/core/pos_auth_core.php');
 
+// [SECURITY FIX 2026-01-03] Load CSRF Helper for token generation
+require_once realpath(__DIR__ . '/../../../src/pos/Helpers/CSRFHelper.php');
+use TopTea\POS\Helpers\CSRFHelper;
+
 $cache_version = time();
+$csrf_token = CSRFHelper::getToken(); // Generate CSRF token for JavaScript
 ?>
 <!doctype html>
 <html lang="zh-CN">
@@ -42,7 +47,11 @@ $cache_version = time();
   <title>TopTea · POS 点餐台</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <script>window.SHIFT_POLICY = 'force_all';</script>
+  <script>
+    window.SHIFT_POLICY = 'force_all';
+    // [SECURITY FIX 2026-01-03] Inject CSRF token for API calls
+    window.CSRF_TOKEN = '<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>';
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link href="./assets/pos.css?v=<?php echo $cache_version; ?>" rel="stylesheet">

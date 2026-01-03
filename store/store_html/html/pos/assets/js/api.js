@@ -12,6 +12,33 @@ async function apiCall(url, options = {}) {
             credentials: 'same-origin'
         };
 
+        // [SECURITY FIX 2026-01-03] Automatically include CSRF token in state-changing requests
+        const method = (fetchOptions.method || 'GET').toUpperCase();
+        const stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+
+        if (stateChangingMethods.includes(method)) {
+            // Add CSRF token to request body
+            if (fetchOptions.headers && fetchOptions.headers['Content-Type'] === 'application/json') {
+                // JSON request - parse, add token, re-stringify
+                const body = JSON.parse(fetchOptions.body || '{}');
+                body.csrf_token = window.CSRF_TOKEN;
+                fetchOptions.body = JSON.stringify(body);
+            } else {
+                // Form data request - add as form field
+                // This case shouldn't happen with current API structure, but included for completeness
+                const formData = new FormData();
+                formData.append('csrf_token', window.CSRF_TOKEN);
+                if (fetchOptions.body) {
+                    // If there's existing form data, merge it
+                    const existingData = new URLSearchParams(fetchOptions.body);
+                    for (const [key, value] of existingData) {
+                        formData.append(key, value);
+                    }
+                }
+                fetchOptions.body = formData;
+            }
+        }
+
         const response = await fetch(url, fetchOptions);
         if (!response.ok) {
             let errorData;

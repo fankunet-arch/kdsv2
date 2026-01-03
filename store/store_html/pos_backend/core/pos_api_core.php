@@ -2,13 +2,19 @@
 /**
  * Toptea POS - 通用 API 核心引擎
  * 职责: 提供 run_api() 驱动基于注册表的 CRUD/自定义动作。
- * Version: 1.0.1
- * Date: 2025-11-09
+ * Version: 1.1.0
+ * Date: 2026-01-03
+ *
+ * [SECURITY UPDATE 2026-01-03]
+ * - Added CSRF token validation for all state-changing requests (POST/PUT/DELETE/PATCH)
  */
 
 require_once realpath(__DIR__ . '/../helpers/pos_json_helper.php');
 require_once realpath(__DIR__ . '/../helpers/pos_datetime_helper.php');
 require_once realpath(__DIR__ . '/../services/PromotionEngine.php');
+require_once realpath(__DIR__ . '/../../../../src/pos/Helpers/CSRFHelper.php');
+
+use TopTea\POS\Helpers\CSRFHelper;
 
 if (!defined('ROLE_STORE_USER'))    define('ROLE_STORE_USER', 'staff');
 if (!defined('ROLE_STORE_MANAGER')) define('ROLE_STORE_MANAGER', 'manager');
@@ -21,6 +27,24 @@ if (!defined('ROLE_SUPER_ADMIN'))   define('ROLE_SUPER_ADMIN', 9);
  */
 function run_api(array $registry, PDO $pdo): void {
     @session_start();
+
+    // --- CSRF Token Validation for state-changing requests ---
+    $request_method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $state_changing_methods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+
+    if (in_array($request_method, $state_changing_methods, true)) {
+        // Get CSRF token from request data
+        $input_data = get_request_data();
+        $csrf_token = $input_data['csrf_token'] ?? '';
+
+        if (!CSRFHelper::validateToken($csrf_token)) {
+            $client_ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $resource = $_GET['res'] ?? 'unknown';
+            $action = $_GET['act'] ?? 'unknown';
+            error_log("POS API: CSRF validation failed. IP: {$client_ip}, Resource: {$resource}, Action: {$action}");
+            json_error('CSRF token validation failed. Please refresh the page and try again.', 403);
+        }
+    }
 
     $resource_name = $_GET['res'] ?? null;
     $action_name   = $_GET['act'] ?? null;

@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
 CREATE TABLE IF NOT EXISTS `pos_cash_movements` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `store_id` INT UNSIGNED NOT NULL COMMENT 'FK: kds_stores.id',
-  `shift_id` BIGINT UNSIGNED NULL COMMENT 'FK: pos_shifts.id (NULL if outside shift)',
+  `shift_id` INT UNSIGNED NULL COMMENT 'FK: pos_shifts.id (NULL if outside shift)',
   `user_id` INT UNSIGNED NOT NULL COMMENT 'FK: kds_users.id',
   `movement_type` ENUM('ADD', 'REMOVE', 'ADJUST') NOT NULL COMMENT 'ADD=加钞, REMOVE=取钞, ADJUST=调整',
   `amount` DECIMAL(10,2) NOT NULL COMMENT 'Amount (positive for ADD, negative for REMOVE)',

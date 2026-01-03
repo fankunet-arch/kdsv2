@@ -248,25 +248,69 @@ if (!function_exists('col_exists')) {
 
 if (!function_exists('compute_expected_cash')) {
     /**
-     * [GEMINI SUPER-ENGINEER FIX (Error 2)]
-     * 重写此函数以使用 getInvoiceSummaryForPeriod，因为它查询的是真实存在的 pos_invoices 表。
-     * 删除了对 pos_payments, pos_orders, pos_cash_movements 的无效查询。
+     * [ARCHITECTURE FIX 2026-01-03]
+     * 计算预期现金总额，基于收银开始备用金、现金销售、现金进出和退款
+     *
+     * @param PDO $pdo Database connection
+     * @param int $store_id Store ID
+     * @param string $start_iso Period start time (ISO 8601 UTC)
+     * @param string $end_iso Period end time (ISO 8601 UTC)
+     * @param float $starting_float Starting cash float
+     * @return array Expected cash breakdown
      */
     function compute_expected_cash(PDO $pdo, int $store_id, string $start_iso, string $end_iso, float $starting_float): array {
-        
-        // 1. [FIX] 调用 getInvoiceSummaryForPeriod 来获取基于 pos_invoices 的正确支付汇总
-        // 该函数已正确处理 payment_summary JSON 解析和找零。
+
+        // 1. Get cash sales from invoices
         $full_summary = getInvoiceSummaryForPeriod($pdo, $store_id, $start_iso, $end_iso);
-        
-        $cash_sales   = (float)($full_summary['payments']['Cash'] ?? 0.0);
-        
-        // 2. [FIX] 由于 pos_cash_movements 表在 .sql 中不存在，必须将 cash_in/out 硬编码为 0
-        $cash_in      = 0.0;
-        $cash_out     = 0.0;
-        
-        // 3. [FIX] 由于没有退款表或清晰的退款支付逻辑，cash_refunds 也必须为 0
+        $cash_sales = (float)($full_summary['payments']['Cash'] ?? 0.0);
+
+        // 2. [CRITICAL FIX 2026-01-03] Query pos_cash_movements table for cash in/out
+        $cash_in = 0.0;
+        $cash_out = 0.0;
+
+        try {
+            $stmt_cash_movements = $pdo->prepare("
+                SELECT movement_type, amount
+                FROM pos_cash_movements
+                WHERE store_id = :store_id
+                  AND created_at BETWEEN :start_time AND :end_time
+            ");
+            $stmt_cash_movements->execute([
+                ':store_id' => $store_id,
+                ':start_time' => $start_iso,
+                ':end_time' => $end_iso
+            ]);
+
+            while ($row = $stmt_cash_movements->fetch(PDO::FETCH_ASSOC)) {
+                $amount = (float)$row['amount'];
+                $type = $row['movement_type'];
+
+                if ($type === 'ADD') {
+                    // ADD movements have positive amounts (cash added to register)
+                    $cash_in += $amount;
+                } elseif ($type === 'REMOVE') {
+                    // REMOVE movements have negative amounts (cash removed from register)
+                    $cash_out += abs($amount);
+                } elseif ($type === 'ADJUST') {
+                    // ADJUST can be positive or negative
+                    if ($amount > 0) {
+                        $cash_in += $amount;
+                    } else {
+                        $cash_out += abs($amount);
+                    }
+                }
+            }
+        } catch (PDOException $e) {
+            // Log error but continue with 0 values
+            error_log("Warning: Failed to query pos_cash_movements: " . $e->getMessage());
+        }
+
+        // 3. Cash refunds - No dedicated refunds table exists
+        // Cancelled invoices are tracked in pos_invoices.status but don't represent cash refunds
+        // This may need future implementation
         $cash_refunds = 0.0;
 
+        // 4. Calculate expected cash
         $expected_cash = (float)$starting_float + (float)$cash_sales + (float)$cash_in - (float)$cash_out - (float)$cash_refunds;
 
         return [

@@ -2,36 +2,59 @@
 /**
  * Toptea POS - Core Configuration File
  * Engineer: Gemini | Date: 2025-10-24
- * Revision: 4.0 (Security Refactor - Environment Variables)
+ * Revision: 5.0 (Error Handling & Logging)
  *
  * [SECURITY FIX 2026-01-03]
  * - Removed hardcoded database credentials
  * - Implemented .env.pos configuration file
  * - Added DotEnv loader for secure configuration management
+ * - Added unified Logger and ErrorHandler (Phase 3)
  */
 
 // --- Load Environment Variables ---
 require_once __DIR__ . '/../../../../../src/pos/Config/DotEnv.php';
+require_once __DIR__ . '/../../../../../src/pos/Helpers/Logger.php';
+require_once __DIR__ . '/../../../../../src/pos/Helpers/ErrorHandler.php';
 
 use TopTea\POS\Config\DotEnv;
+use TopTea\POS\Helpers\Logger;
+use TopTea\POS\Helpers\ErrorHandler;
 
 $dotenv = new DotEnv(__DIR__ . '/../../../../../');
 $dotenv->load();
 
-// --- [SECURITY FIX V2.0 + V4.0] ---
+// --- [PHASE 3 FIX] Initialize Logger and ErrorHandler ---
 $logPath = DotEnv::get('LOG_PATH', __DIR__ . '/../../../../../storage/logs/pos/');
 if (!is_dir($logPath)) {
     @mkdir($logPath, 0755, true);
 }
 
-ini_set('display_errors', DotEnv::get('APP_DEBUG', 'false') === 'true' ? '1' : '0');
+// Initialize Logger
+$isDevelopment = DotEnv::get('APP_DEBUG', 'false') === 'true';
+Logger::init(
+    $logPath,
+    $isDevelopment ? Logger::DEBUG : Logger::INFO,
+    $isDevelopment  // Include stack trace in development
+);
+
+// Initialize ErrorHandler
+ErrorHandler::register($isDevelopment);
+
+// Configure PHP error handling
+ini_set('display_errors', $isDevelopment ? '1' : '0');
 ini_set('display_startup_errors', '0');
 ini_set('log_errors', '1');
 ini_set('error_log', $logPath . 'php_errors_pos.log');
-// --- [END FIX] ---
+// --- [END PHASE 3 FIX] ---
 
 error_reporting(E_ALL);
 mb_internal_encoding('UTF-8');
+
+// Log configuration initialization
+Logger::info('POS Configuration loaded', [
+    'environment' => $isDevelopment ? 'development' : 'production',
+    'log_path' => $logPath,
+]);
 
 // --- Database Configuration (From .env.pos) ---
 $db_host = DotEnv::get('DB_HOST');
@@ -62,16 +85,24 @@ try {
 
     // [A1 UTC SYNC] Set connection timezone to UTC
     $pdo->exec("SET time_zone='+00:00'");
-    
+
+    Logger::info('Database connection established');
+
 } catch (\PDOException $e) {
-    error_log("POS Database connection failed: " . $e->getMessage());
+    // Log database connection error
+    Logger::critical('Database connection failed', [
+        'error' => $e->getMessage(),
+        'host' => $db_host,
+        'database' => $db_name,
+    ]);
+
     // For POS, we must die cleanly in a way the frontend can parse
     header('Content-Type: application/json; charset=utf-8');
     http_response_code(503); // Service Unavailable
     echo json_encode([
         'status' => 'error',
-        'message' => 'DB Connection Error (POS)',
+        'message' => $isDevelopment ? 'DB Connection Error: ' . $e->getMessage() : 'Database connection error. Please try again later.',
         'data' => null
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }

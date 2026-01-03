@@ -1,10 +1,13 @@
 # Environment Configuration
 .env
+.env.pos
 
 # Logs
 *.log
 /var/log/kds/
 src/kds/Core/php_errors*.log
+storage/logs/
+store/store_html/pos_backend/core/php_errors*.log
 
 # IDE
 .idea/

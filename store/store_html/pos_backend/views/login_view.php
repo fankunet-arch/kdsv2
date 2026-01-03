@@ -1,3 +1,11 @@
+<?php
+/**
+ * TopTea POS - Login View
+ * [SECURITY FIX 2026-01-03] Added CSRF Protection
+ */
+require_once __DIR__ . '/../../../../src/pos/Helpers/CSRFHelper.php';
+use TopTea\POS\Helpers\CSRFHelper;
+?>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -26,6 +34,7 @@
             <?php endif; ?>
 
             <form action="api/pos_login_handler.php" method="POST">
+                <?php echo CSRFHelper::getTokenField(); ?>
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="store_code" name="store_code" placeholder="门店码" required>
                     <label for="store_code" data-i18n-key="label_store_code">门店码</label>

@@ -2,25 +2,43 @@
 /**
  * Toptea POS - Core Configuration File
  * Engineer: Gemini | Date: 2025-10-24
- * Revision: 3.0 (Sync with HQ Error Logging)
+ * Revision: 4.0 (Security Refactor - Environment Variables)
+ *
+ * [SECURITY FIX 2026-01-03]
+ * - Removed hardcoded database credentials
+ * - Implemented .env.pos configuration file
+ * - Added DotEnv loader for secure configuration management
  */
 
-// --- [SECURITY FIX V2.0] ---
-ini_set('display_errors', '0'); // Turn off displaying errors in production
+// --- Load Environment Variables ---
+require_once __DIR__ . '/../../../../../src/pos/Config/DotEnv.php';
+
+use TopTea\POS\Config\DotEnv;
+
+$dotenv = new DotEnv(__DIR__ . '/../../../../../');
+$dotenv->load();
+
+// --- [SECURITY FIX V2.0 + V4.0] ---
+$logPath = DotEnv::get('LOG_PATH', __DIR__ . '/../../../../../storage/logs/pos/');
+if (!is_dir($logPath)) {
+    @mkdir($logPath, 0755, true);
+}
+
+ini_set('display_errors', DotEnv::get('APP_DEBUG', 'false') === 'true' ? '1' : '0');
 ini_set('display_startup_errors', '0');
-ini_set('log_errors', '1'); // Enable logging errors
-ini_set('error_log', __DIR__ . '/php_errors_pos.log'); // Log errors to this file
+ini_set('log_errors', '1');
+ini_set('error_log', $logPath . 'php_errors_pos.log');
 // --- [END FIX] ---
 
 error_reporting(E_ALL);
 mb_internal_encoding('UTF-8');
 
-// --- Database Configuration (Copied from HQ) ---
-$db_host = 'mhdlmskv3gjbpqv3.mysql.db';
-$db_name = 'mhdlmskv3gjbpqv3';
-$db_user = 'mhdlmskv3gjbpqv3';
-$db_pass = 'zqVdVfAWYYaa4gTAuHWX7CngpRDqR';
-$db_char = 'utf8mb4';
+// --- Database Configuration (From .env.pos) ---
+$db_host = DotEnv::get('DB_HOST');
+$db_name = DotEnv::get('DB_NAME');
+$db_user = DotEnv::get('DB_USER');
+$db_pass = DotEnv::get('DB_PASS');
+$db_char = DotEnv::get('DB_CHARSET', 'utf8mb4');
 
 // --- Application Settings ---
 define('POS_BASE_URL', '/pos/'); // Relative base URL for the POS app

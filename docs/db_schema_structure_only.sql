@@ -20,7 +20,7 @@ SET time_zone = "+00:00";
 --
 -- 数据库： `mhdlmskv3gjbpqv3`
 --
-CREATE DATABASE IF NOT EXISTS `mhdlmskv3gjbpqv3` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `mhdlmskv3gjbpqv3` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE `mhdlmskv3gjbpqv3`;
 
 -- --------------------------------------------------------
@@ -770,7 +770,7 @@ CREATE TABLE `pos_eod_records` (
   `counted_cash` decimal(10,2) NOT NULL DEFAULT '0.00',
   `cash_diff` decimal(10,2) NOT NULL DEFAULT '0.00',
   `created_at` datetime(6) NOT NULL DEFAULT (utc_timestamp(6))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -813,7 +813,7 @@ CREATE TABLE `pos_held_orders` (
   `cart_data` json NOT NULL,
   `total_amount` decimal(10,2) NOT NULL DEFAULT '0.00',
   `created_at` datetime(6) NOT NULL DEFAULT (utc_timestamp(6))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用于存储POS端挂起的订单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用于存储POS端挂起的订单';
 
 -- --------------------------------------------------------
 
@@ -1054,7 +1054,7 @@ CREATE TABLE `pos_point_redemption_rules` (
   `created_at` datetime(6) NOT NULL DEFAULT (utc_timestamp(6)),
   `updated_at` datetime(6) NOT NULL DEFAULT (utc_timestamp(6)) ON UPDATE CURRENT_TIMESTAMP(6),
   `deleted_at` datetime(6) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1073,7 +1073,7 @@ CREATE TABLE `pos_print_templates` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
   `created_at` datetime(6) NOT NULL DEFAULT (utc_timestamp(6)),
   `updated_at` datetime(6) NOT NULL DEFAULT (utc_timestamp(6)) ON UPDATE CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='POS打印模板配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='POS打印模板配置表';
 
 -- --------------------------------------------------------
 
@@ -1137,7 +1137,7 @@ CREATE TABLE `pos_settings` (
   `setting_value` text NOT NULL,
   `description` text,
   `updated_at` datetime(6) NOT NULL DEFAULT (utc_timestamp(6)) ON UPDATE CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1206,7 +1206,7 @@ CREATE TABLE `sm_assignments` (
   `condition_key` varchar(50) NOT NULL COMMENT '条件键: 日期(2025-12-01) / HOLIDAY / 星期(1-7)',
   `strategy_id` int UNSIGNED NOT NULL COMMENT '关联策略ID',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SoundMatrix-规则指派表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SoundMatrix-规则指派表';
 
 -- --------------------------------------------------------
 
@@ -1219,7 +1219,7 @@ CREATE TABLE `sm_calendar` (
   `calendar_date` date NOT NULL COMMENT '具体日期',
   `day_type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1=节假日(Holiday), 0=调休工作日(Workday)',
   `description` varchar(100) DEFAULT NULL COMMENT '备注(如:国庆节)'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SoundMatrix-日历表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SoundMatrix-日历表';
 
 -- --------------------------------------------------------
 
@@ -1237,7 +1237,7 @@ CREATE TABLE `sm_devices` (
   `last_heartbeat` datetime DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `status` tinyint(1) DEFAULT '1' COMMENT '设备状态: 0=未激活(待审核), 1=已激活(正常), 2=已禁用(拉黑)'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SoundMatrix-设备终端表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SoundMatrix-设备终端表';
 
 -- --------------------------------------------------------
 
@@ -1257,7 +1257,7 @@ CREATE TABLE `sm_device_access_log` (
   `request_data` text COMMENT '请求数据(JSON格式，敏感信息已脱敏)',
   `device_id` int UNSIGNED DEFAULT NULL COMMENT '关联的设备ID（如果设备已注册）',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '访问时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SoundMatrix-设备访问日志表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SoundMatrix-设备访问日志表';
 
 -- --------------------------------------------------------
 
@@ -1274,7 +1274,7 @@ CREATE TABLE `sm_playlists` (
   `created_by` int DEFAULT NULL COMMENT '创建人ID(关联admin)',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SoundMatrix-歌单表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SoundMatrix-歌单表';
 
 -- --------------------------------------------------------
 
@@ -1293,7 +1293,7 @@ CREATE TABLE `sm_songs` (
   `duration` int UNSIGNED DEFAULT '0' COMMENT '时长(秒)',
   `is_active` tinyint(1) DEFAULT '1' COMMENT '1=启用, 0=软删除',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SoundMatrix-曲库表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SoundMatrix-曲库表';
 
 -- --------------------------------------------------------
 
@@ -1308,7 +1308,7 @@ CREATE TABLE `sm_strategies` (
   `timeline_json` json NOT NULL COMMENT '时间轴配置 [{"start":"08:00","end":"12:00","playlist_id":1},...]',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SoundMatrix-策略定义表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='SoundMatrix-策略定义表';
 
 -- --------------------------------------------------------
 

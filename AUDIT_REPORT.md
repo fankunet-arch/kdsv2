@@ -1,74 +1,53 @@
-# TopTea KDS & POS 系统全面审计报告
+# TopTea KDS & POS 系统全面审计报告 (复审)
 **日期:** 2026-01-03
 **审计员:** Jules (资深PHP系统审计师)
 
-## 1. 架构错误 (严重)
+## 1. 审计综述
 
-### 1.1 KDS API Gateway 缺失
-- **严重程度:** **严重** (系统不可用)
-- **描述:** 代码库中完全缺失 `public/kds/api/kds_api_gateway.php` 文件及其注册表 `public/kds/api/registries/kds_registry.php`。
-- **影响:** KDS 前端除了登录 (`kds_login_handler.php`) 和获取图片 (`get_image.php`) 外，无法与后端进行任何通信。所有业务 API 调用（如获取订单、SOP）都将返回 **404 Not Found**。
-- **证据:** `ls public/kds/api/` 仅显示 `get_image.php` 和 `kds_login_handler.php`。
-- **建议:** 立即恢复 KDS API Gateway 和注册表文件。
+虽然接收到“所有问题已修复”的通知，但经过对重置后的代码库进行全面复核，**审计发现严重问题依然存在**。系统目前处于不可用状态。
 
-### 1.2 KDS 逻辑代码孤立
-- **严重程度:** 高
-- **描述:** `src/kds/Helpers/KdsRepository.php` 包含迁移后的业务逻辑（例如 `KdsSopParser`），但由于缺少 API 网关调用它，这部分代码目前处于**不可达**状态（死代码）。
+## 2. 架构错误 (严重 - 未修复)
 
-## 2. 函数错误与遗漏
+### 2.1 KDS API Gateway 缺失
+- **状态:** **未修复**
+- **描述:** `public/kds/api/` 目录下依然缺失 `kds_api_gateway.php` 和 `kds_registry.php`。
+- **影响:** KDS 系统无法进行任何业务数据交互。
 
-### 2.1 POS 现金流向逻辑不匹配
-- **严重程度:** 中
-- **描述:** 在 `src/pos/Helpers/pos_repo.php`（`compute_expected_cash` 函数）中，代码明确将 `cash_in`、`cash_out` 和 `cash_refunds` 硬编码为 `0.0`，并注释称该表不存在。然而，迁移脚本 `001_system_fixes_and_optimizations.sql` **确实创建**了 `pos_cash_movements` 表。
-- **影响:** 即使数据库支持，POS 中的现金追踪功能也无法工作。
-- **建议:** 更新 `pos_repo.php` 以查询 `pos_cash_movements` 表。
+## 3. 实现错误 (运行时阻塞 - 未修复)
 
-### 2.2 POS Json Helper 冗余
-- **严重程度:** 低 (维护性)
-- **描述:** POS 使用带有全局函数（`json_ok`, `json_error`）的 `src/pos/Helpers/pos_json_helper.php`，而 KDS 使用规范的类 `TopTea\KDS\Helpers\JsonHelper`。这导致了编码标准不一致。
-- **建议:** 重构 POS 以使用 `TopTea\POS\Helpers\JsonHelper` 类以保持一致性。
+### 3.1 KDS 登录视图路径错误
+- **状态:** **未修复**
+- **描述:** `src/kds/Views/pages/login_view.php` 第 14 行代码为：
+  `require_once realpath(__DIR__ . '/../../../helpers/csrf_helper.php');`
+- **问题:**
+  1. 路径中的 `helpers` 应为 `Helpers` (大小写敏感)。
+  2. 目标文件 `csrf_helper.php` 不存在，正确文件应为 `CsrfHelper.php`。
+- **结果:** 访问 KDS 登录页面导致 **500 Fatal Error** (Failed opening required '')。
+- **证据:** 见截图 `kds_login_result.png` (展示错误页面)。
 
-## 3. 注册表与代码冗余
+### 3.2 POS 配置命名空间不匹配
+- **状态:** **未修复**
+- **描述:** `src/pos/Config/config.php` 引用了错误的命名空间：
+  `use TopTea\POS\Core\Logger;`
+  `use TopTea\POS\Core\ErrorHandler;`
+- **问题:** 实际类文件位于 `src/pos/Helpers/` 目录下，命名空间为 `TopTea\POS\Helpers`。
+- **结果:** 访问 POS 登录页面导致 **Fatal Error: Class "TopTea\POS\Core\Logger" not found**。
+- **证据:** 见截图 `pos_login_result.png` (展示错误页面)。
 
-### 3.1 核心类重复
-- **严重程度:** 中
-- **描述:** 以下核心类在 `src/kds/Core` 和 `src/pos/Core` 中完全重复：
-    - `SessionManager`
-    - `Logger`
-    - `ErrorHandler`
-    - `Autoloader`
-    - `DotEnv` (在 Config 中)
-- **影响:** 双重维护成本。KDS Core 中的修复不会自动应用于 POS Core。
-- **建议:** 将共享的核心逻辑移动到公共的 `src/Shared/Core` 命名空间。
+## 4. 函数与逻辑错误
 
-## 4. 实现错误 (运行时发现)
+### 4.1 POS 现金流向逻辑错误
+- **状态:** **未修复**
+- **描述:** `src/pos/Helpers/pos_repo.php` 依然硬编码现金流为 `0.0`，无视已存在的 `pos_cash_movements` 表。
 
-### 4.1 KDS 登录视图路径错误 (阻塞性)
-- **严重程度:** 高 (阻塞)
-- **描述:** `src/kds/Views/pages/login_view.php` 尝试 `require_once` 路径为 `../../../helpers/csrf_helper.php` 的文件。该路径不正确（小写的 `helpers`），且文件应为 `src/kds/Helpers/CsrfHelper.php`（基于类的文件）。
-- **影响:** KDS 登录页面抛出致命错误 (500) 且无法加载。**见截图 `kds_login_result.png`。**
-- **修复方案:** 更新 `src/kds/Views/pages/login_view.php` 以引入 `__DIR__ . '/../../Helpers/CsrfHelper.php'` 并使用 `CsrfHelper` 类方法，而非已废弃的全局函数（或者确保加载了全局别名）。
+## 5. 结论
 
-### 4.2 POS 配置命名空间不匹配 (阻塞性)
-- **严重程度:** 高 (阻塞)
-- **描述:** `src/pos/Config/config.php` 尝试使用 `TopTea\POS\Core\Logger` 和 `TopTea\POS\Core\ErrorHandler`，但这些类定义在 `TopTea\POS\Helpers` 命名空间中。
-- **影响:** POS 系统在启动时抛出致命错误 (500)。**见截图 `pos_login_result.png`。**
-- **修复方案:** 更新 `src/pos/Config/config.php` 以使用正确的命名空间：`use TopTea\POS\Helpers\Logger;` 和 `use TopTea\POS\Helpers\ErrorHandler;`。
+系统当前**无法运行**。虽然已搭建本地环境（数据库、Web服务器配置），但由于代码本身的路径引用和命名空间错误，两个子系统均在启动阶段崩溃。
 
-## 5. 安全与最佳实践 (已验证)
-
-- **登录处理器:** KDS 和 POS 登录处理器均正确实现了：
-    - **CSRF 防护:** 已验证。
-    - **速率限制:** 已验证 (15分钟内5次尝试)。
-    - **安全会话:** 已验证 (`SessionManager::init()` 使用了 `httponly`, `samesite`)。
-- **输入验证:** KDS 使用 `InputValidator` 类；POS 使用内联检查。风格一致但实现不同。
-
-## 6. 环境验证状态
-
-由于“禁止修改代码”的限制，在验证问题后，源代码已回退到原始状态。
-- **KDS 登录:** 由于问题 4.1 失败 (500 错误)。
-- **POS 登录:** 由于问题 4.2 失败 (500 错误)。
-- **截图:** 提供的截图 (`kds_login_result.png`, `pos_login_result.png`) 展示了由这些 Bug 导致的 500 错误页面，证实了审计发现。
+**修复建议:**
+1.  修正 KDS `login_view.php` 中的 `require` 路径。
+2.  修正 POS `config.php` 中的 `use` 命名空间。
+3.  补全缺失的 KDS API Gateway 文件。
 
 ---
-**审计报告结束**
+**复审报告结束**

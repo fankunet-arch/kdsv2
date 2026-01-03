@@ -3,19 +3,23 @@
  * Toptea Store - POS
  * Backend Login Handler for POS
  * Engineer: Gemini | Date: 2025-10-30
- * Revision: 2.0 (Security Refactor - CSRF + Rate Limiting)
+ * Revision: 2.1 (Session Management Update)
  *
  * [SECURITY FIX 2026-01-03]
  * - Added CSRF token validation
  * - Added login rate limiting (5 attempts per 15 minutes)
- * - Removed @session_start() (will be replaced with SessionManager in Phase 2)
+ * - Replaced @session_start() with SessionManager::start()
  */
 
-@session_start();
 require_once realpath(__DIR__ . '/../../../pos_backend/core/config.php');
 require_once realpath(__DIR__ . '/../../../../../src/pos/Helpers/CSRFHelper.php');
+require_once realpath(__DIR__ . '/../../../../../src/pos/Core/SessionManager.php');
 
 use TopTea\POS\Helpers\CSRFHelper;
+use TopTea\POS\Core\SessionManager;
+
+// Start session using SessionManager
+SessionManager::start();
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -105,8 +109,8 @@ try {
             ");
             $stmt_clear->execute([$username, $ip_address]);
 
-            // Regenerate session ID for security
-            session_regenerate_id(true);
+            // Regenerate session ID for security (prevents session fixation attacks)
+            SessionManager::regenerate(true);
 
             // Set session variables
             $_SESSION['pos_logged_in'] = true;

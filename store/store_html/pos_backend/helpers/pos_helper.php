@@ -1,15 +1,20 @@
 <?php
 // pos_helper.php
 // 核心助手函数
+//
+// [SECURITY UPDATE 2026-01-03]
+// - Replaced session_start() with SessionManager::start()
+
+require_once realpath(__DIR__ . '/../../../../src/pos/Core/SessionManager.php');
+use TopTea\POS\Core\SessionManager;
 
 /**
  * 确保当前有一个活动的班次，否则抛出错误。
  * 这是所有销售和资金操作的保护锁。
  */
 function ensure_active_shift_or_fail(PDO $pdo): int {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    // Ensure session is started
+    SessionManager::start();
 
     $shift_id = (int)($_SESSION['pos_shift_id'] ?? 0);
     $store_id = (int)($_SESSION['pos_store_id'] ?? 0);

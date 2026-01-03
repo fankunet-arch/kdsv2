@@ -13,8 +13,10 @@ require_once realpath(__DIR__ . '/../helpers/pos_json_helper.php');
 require_once realpath(__DIR__ . '/../helpers/pos_datetime_helper.php');
 require_once realpath(__DIR__ . '/../services/PromotionEngine.php');
 require_once realpath(__DIR__ . '/../../../../src/pos/Helpers/CSRFHelper.php');
+require_once realpath(__DIR__ . '/../../../../src/pos/Core/SessionManager.php');
 
 use TopTea\POS\Helpers\CSRFHelper;
+use TopTea\POS\Core\SessionManager;
 
 if (!defined('ROLE_STORE_USER'))    define('ROLE_STORE_USER', 'staff');
 if (!defined('ROLE_STORE_MANAGER')) define('ROLE_STORE_MANAGER', 'manager');
@@ -26,7 +28,8 @@ if (!defined('ROLE_SUPER_ADMIN'))   define('ROLE_SUPER_ADMIN', 9);
  * @param PDO   $pdo
  */
 function run_api(array $registry, PDO $pdo): void {
-    @session_start();
+    // Start session using SessionManager
+    SessionManager::start();
 
     // --- CSRF Token Validation for state-changing requests ---
     $request_method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

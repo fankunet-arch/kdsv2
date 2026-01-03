@@ -1,9 +1,17 @@
 <?php
 /**
  * TopTea POS · API Auth Core
- * v1.0.0
+ * v1.0.1
+ *
+ * [SECURITY UPDATE 2026-01-03]
+ * - Replaced @session_start() with SessionManager::start()
  */
-@session_start();
+
+require_once realpath(__DIR__ . '/../../../../src/pos/Core/SessionManager.php');
+use TopTea\POS\Core\SessionManager;
+
+// Start session using SessionManager
+SessionManager::start();
 
 /** 统一 JSON 错误返回 */
 function api_auth_fail(string $msg = 'Unauthorized'): void {

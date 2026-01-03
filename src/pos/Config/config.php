@@ -17,8 +17,8 @@
 require_once __DIR__ . '/../Core/Autoloader.php';
 
 use TopTea\POS\Config\DotEnv;
-use TopTea\POS\Core\ErrorHandler;
-use TopTea\POS\Core\Logger;
+use TopTea\POS\Helpers\ErrorHandler;
+use TopTea\POS\Helpers\Logger;
 
 // Initialize autoloader
 \TopTea\POS\Core\Autoloader::register();

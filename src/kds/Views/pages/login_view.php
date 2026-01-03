@@ -10,8 +10,8 @@
 </head>
 <body>
     <?php
-    // [FIX] Load CSRF helper
-    require_once realpath(__DIR__ . '/../../../helpers/csrf_helper.php');
+    // CSRF helper is auto-loaded via config.php and Autoloader
+    // CsrfHelper class and global functions (csrfTokenField, etc.) are available
     ?>
     <div class="login-container">
         <div class="login-box">

@@ -9,7 +9,7 @@
  * - Improved session security with centralized management
  */
 
-require_once realpath(__DIR__ . '/../../../../src/pos/Core/SessionManager.php');
+require_once __DIR__ . '/SessionManager.php';
 use TopTea\POS\Core\SessionManager;
 
 // Start session using SessionManager

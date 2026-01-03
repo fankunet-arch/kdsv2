@@ -137,7 +137,7 @@ function handle_order_submit(PDO $pdo, array $config, array $input_data): void {
     $compliance_data = null;
     $qr_payload = null;
     if ($compliance_system) {
-        $handler_path = realpath(__DIR__ . "/../../../pos_backend/compliance/{$compliance_system}Handler.php");
+        $handler_path = realpath(__DIR__ . "/../../../src/pos/Compliance/{$compliance_system}Handler.php");
         if ($handler_path && file_exists($handler_path)) {
             require_once $handler_path;
             $class = $compliance_system . 'Handler';

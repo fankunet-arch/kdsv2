@@ -11,9 +11,7 @@
  * - Replaced @session_start() with SessionManager::start()
  */
 
-require_once realpath(__DIR__ . '/../../../pos_backend/core/config.php');
-require_once realpath(__DIR__ . '/../../../../../src/pos/Helpers/CSRFHelper.php');
-require_once realpath(__DIR__ . '/../../../../../src/pos/Core/SessionManager.php');
+require_once __DIR__ . '/../../src/pos/Config/config.php';
 
 use TopTea\POS\Helpers\CSRFHelper;
 use TopTea\POS\Core\SessionManager;

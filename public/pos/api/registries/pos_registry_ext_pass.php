@@ -28,19 +28,19 @@ declare(strict_types=1);
  */
 
 // 1. 加载核心助手 (json_error 等)
-require_once realpath(__DIR__ . '/../../../../pos_backend/helpers/pos_json_helper.php');
+require_once __DIR__ . '/../../../src/pos/Helpers/pos_json_helper.php';
 
 // 2. 加载核心助手 (pos_helper.php 加载了 pos_repo, datetime, promotion_engine 等)
-require_once realpath(__DIR__ . '/../../../../pos_backend/helpers/pos_helper.php');
+require_once __DIR__ . '/../../../src/pos/Helpers/pos_helper.php';
 
 // 3. 加载班次守卫
-require_once realpath(__DIR__ . '/../../../../pos_backend/core/shift_guard.php');
+require_once __DIR__ . '/../../../src/pos/Core/shift_guard.php';
 
 // 4. [B1.5 ERROR 2 FIX] 加载 P3 (核销) 事务的专属依赖
 // (pos_repo_ext_pass.php 提供了 get_member_pass_for_update)
-require_once realpath(__DIR__ . '/../../../../pos_backend/helpers/pos_repo_ext_pass.php');
+require_once __DIR__ . '/../../../src/pos/Helpers/pos_repo_ext_pass.php';
 // (pos_pass_helper.php 提供了 validate_redeem_limits 和 create_redeem_records)
-require_once realpath(__DIR__ . '/../../../../pos_backend/helpers/pos_pass_helper.php');
+require_once __DIR__ . '/../../../src/pos/Helpers/pos_pass_helper.php';
 
 
 if (!function_exists('handle_pass_redeem')) {

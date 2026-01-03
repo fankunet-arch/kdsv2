@@ -5,7 +5,7 @@
 // [SECURITY UPDATE 2026-01-03]
 // - Replaced session_start() with SessionManager::start()
 
-require_once realpath(__DIR__ . '/../../../../src/pos/Core/SessionManager.php');
+require_once __DIR__ . '/../Core/SessionManager.php';
 use TopTea\POS\Core\SessionManager;
 
 /**

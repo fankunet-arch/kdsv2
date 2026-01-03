@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-require_once realpath(__DIR__ . '/../../../../pos_backend/helpers/pos_helper.php');
-require_once realpath(__DIR__ . '/../../../../pos_backend/helpers/pos_repo_ext_pass.php');
-require_once realpath(__DIR__ . '/../../../../pos_backend/helpers/pos_pass_helper.php');
+require_once __DIR__ . '/../../../src/pos/Helpers/pos_helper.php';
+require_once __DIR__ . '/../../../src/pos/Helpers/pos_repo_ext_pass.php';
+require_once __DIR__ . '/../../../src/pos/Helpers/pos_pass_helper.php';
 
 if (!defined('ROLE_STORE_MANAGER')) define('ROLE_STORE_MANAGER', 'manager');
 
@@ -37,7 +37,7 @@ function handle_diag_selfcheck(PDO $pdo, array $config, array $input): void {
     ];
 
     // 2) 关键文件存在性（路径是否匹配我们本次交付）
-    $base = realpath(__DIR__ . '/../../../../pos_backend/helpers');
+    $base = realpath(__DIR__ . '/../../../src/pos/Helpers');
     $checks['files'] = [
         'pos_repo_ext_pass.php' => file_exists($base . '/pos_repo_ext_pass.php'),
         'pos_pass_helper.php'   => file_exists($base . '/pos_pass_helper.php'),

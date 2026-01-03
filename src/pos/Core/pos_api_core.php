@@ -9,11 +9,11 @@
  * - Added CSRF token validation for all state-changing requests (POST/PUT/DELETE/PATCH)
  */
 
-require_once realpath(__DIR__ . '/../helpers/pos_json_helper.php');
-require_once realpath(__DIR__ . '/../helpers/pos_datetime_helper.php');
-require_once realpath(__DIR__ . '/../services/PromotionEngine.php');
-require_once realpath(__DIR__ . '/../../../../src/pos/Helpers/CSRFHelper.php');
-require_once realpath(__DIR__ . '/../../../../src/pos/Core/SessionManager.php');
+require_once __DIR__ . '/../Helpers/pos_json_helper.php';
+require_once __DIR__ . '/../Helpers/pos_datetime_helper.php';
+require_once __DIR__ . '/../Services/PromotionEngine.php';
+require_once __DIR__ . '/../Helpers/CSRFHelper.php';
+require_once __DIR__ . '/SessionManager.php';
 
 use TopTea\POS\Helpers\CSRFHelper;
 use TopTea\POS\Core\SessionManager;

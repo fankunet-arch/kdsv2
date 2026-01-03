@@ -1,85 +1,79 @@
 <?php
 /**
- * TopTea POS - Login Page View
+ * TopTea POS - Login View
+ * [ARCHITECTURE UPDATE 2026-01-03] Migrated to new KDS-aligned structure
+ * [SECURITY FIX 2026-01-03] CSRF Protection already handled by public/pos/login.php
  *
- * This is a temporary placeholder. The full login interface from
- * store/store_html/pos_backend/views/login_view.php should be migrated here.
- *
- * @author TopTea Engineering Team
- * @version 1.0.0 (Placeholder)
- * @date 2026-01-03
+ * This view is loaded by public/pos/login.php after session initialization.
+ * Variables available:
+ * - $csrf_token: CSRF token (already set by login.php)
  */
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>登录 - TopTea POS</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopTea POS - 登录</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo POS_BASE_URL; ?>assets/css/pos_login.css?v=<?php echo time(); ?>">
+    <style>
+        .lang-switch-footer .lang-flag { cursor: pointer; opacity: 0.5; transition: opacity 0.2s; display: inline-block; margin: 0 5px; }
+        .lang-switch-footer .lang-flag.active { opacity: 1; transform: scale(1.1); }
+        .lang-switch-footer .flag { width: 36px; height: 24px; border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
+    </style>
 </head>
-<body class="bg-light">
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2 class="text-center mb-1 fw-bold"><span style="color: #ED7762;">TOPTEA</span> POS</h2>
+            <h5 class="text-center text-muted mb-4" data-i18n-key="title_sub">点餐收银系统</h5>
 
-  <div class="container">
-    <div class="row justify-content-center align-items-center min-vh-100">
-      <div class="col-md-5">
+            <?php if (isset($_GET['error'])): ?>
+                <?php if ($_GET['error'] === 'csrf'): ?>
+                    <div class="alert alert-danger" role="alert">
+                        安全验证失败，请重试。(CSRF token validation failed)
+                    </div>
+                <?php elseif ($_GET['error'] === 'rate_limit'): ?>
+                    <div class="alert alert-danger" role="alert">
+                        登录尝试次数过多，请15分钟后再试。(Too many login attempts)
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-danger" role="alert" data-i18n-key="error_invalid_credentials">
+                        无效的门店码、用户名或密码。
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
 
-        <div class="card shadow">
-          <div class="card-body p-5">
-            <div class="text-center mb-4">
-              <h2 class="fw-bold">TopTea POS</h2>
-              <p class="text-muted">门店点餐系统</p>
-            </div>
-
-            <div class="alert alert-info">
-              <h6><i class="bi bi-info-circle"></i> 架构重构通知</h6>
-              <p class="small mb-0">
-                新的POS架构已就绪！<br>
-                临时请使用旧版登录：<br>
-                <a href="/store/store_html/html/pos/login.php" class="btn btn-sm btn-primary mt-2 w-100">
-                  <i class="bi bi-arrow-right"></i> 访问旧版登录 (临时)
-                </a>
-              </p>
-            </div>
-
-            <!-- Placeholder form (not functional yet) -->
-            <form action="api/login_handler.php" method="POST">
-              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-
-              <div class="mb-3">
-                <label for="store_code" class="form-label">门店代码</label>
-                <input type="text" class="form-control" id="store_code" name="store_code" required disabled>
-              </div>
-
-              <div class="mb-3">
-                <label for="username" class="form-label">用户名</label>
-                <input type="text" class="form-control" id="username" name="username" required disabled>
-              </div>
-
-              <div class="mb-3">
-                <label for="password" class="form-label">密码</label>
-                <input type="password" class="form-control" id="password" name="password" required disabled>
-              </div>
-
-              <button type="submit" class="btn btn-primary w-100" disabled>
-                <i class="bi bi-box-arrow-in-right"></i> 登录 (迁移中)
-              </button>
+            <form action="<?php echo POS_BASE_URL; ?>api/pos_login_handler.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="store_code" name="store_code" placeholder="门店码" required>
+                    <label for="store_code" data-i18n-key="label_store_code">门店码</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="用户名" required>
+                    <label for="username" data-i18n-key="label_username">用户名</label>
+                </div>
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="密码" required>
+                    <label for="password" data-i18n-key="label_password">密码</label>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-brand btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> <span data-i18n-key="btn_login">登 录</span>
+                    </button>
+                </div>
             </form>
 
-            <div class="text-center mt-4">
-              <small class="text-muted">
-                TopTea © 2026 | 版本 2.0 (架构重构)
-              </small>
+            <div class="lang-switch-footer mt-4 text-center">
+                <span class="lang-flag" data-lang="zh"><svg class="flag" viewBox="0 0 30 20"><rect fill="#DE2910" height="20" width="30"></rect><text fill="#FFDE00" font-size="8.5" x="6" y="8">★</text><text fill="#FFDE00" font-size="3.8" x="12.5" y="4.5">★</text><text fill="#FFDE00" font-size="3.8" x="14.5" y="8">★</text><text fill="#FFDE00" font-size="3.8" x="12.5" y="11.5">★</text><text fill="#FFDE00" font-size="3.8" x="9.8" y="9.5">★</text></svg></span>
+                <span class="lang-flag" data-lang="es"><svg class="flag" viewBox="0 0 30 20"><rect fill="#AA151B" height="20" width="30"></rect><rect y="5" width="30" height="10" fill="#F1BF00"></rect></svg></span>
             </div>
-          </div>
         </div>
-
-      </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="<?php echo POS_BASE_URL; ?>assets/js/login.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

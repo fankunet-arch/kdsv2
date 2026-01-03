@@ -59,13 +59,13 @@ echo "<div class='step'>";
 echo "<h2>📦 步骤2: 加载核心文件</h2>";
 
 try {
-    require_once realpath(__DIR__ . '/../../../pos_backend/core/config.php');
+    require_once __DIR__ . '/../../src/pos/Config/config.php';
     echo "<p class='success'>✓ config.php</p>";
 
-    require_once realpath(__DIR__ . '/../../../pos_backend/helpers/pos_json_helper.php');
+    require_once __DIR__ . '/../../src/pos/Helpers/pos_json_helper.php';
     echo "<p class='success'>✓ pos_json_helper.php</p>";
 
-    require_once realpath(__DIR__ . '/../../../pos_backend/core/pos_api_core.php');
+    require_once __DIR__ . '/../../src/pos/Core/pos_api_core.php';
     echo "<p class='success'>✓ pos_api_core.php</p>";
 
     // 加载注册表

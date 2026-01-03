@@ -24,12 +24,12 @@ $warnings = [];
 // ===== 步骤1: 检查核心文件 =====
 echo "【步骤1】检查核心文件...\n";
 $core_files = [
-    'config' => '../../../pos_backend/core/config.php',
-    'json_helper' => '../../../pos_backend/helpers/pos_json_helper.php',
-    'datetime_helper' => '../../../pos_backend/helpers/pos_datetime_helper.php',
-    'helper' => '../../../pos_backend/helpers/pos_helper.php',
-    'repo' => '../../../pos_backend/helpers/pos_repo.php',
-    'repo_ext_pass' => '../../../pos_backend/helpers/pos_repo_ext_pass.php',
+    'config' => '../../src/pos/Config/config.php',
+    'json_helper' => '../../src/pos/Helpers/pos_json_helper.php',
+    'datetime_helper' => '../../src/pos/Helpers/pos_datetime_helper.php',
+    'helper' => '../../src/pos/Helpers/pos_helper.php',
+    'repo' => '../../src/pos/Helpers/pos_repo.php',
+    'repo_ext_pass' => '../../src/pos/Helpers/pos_repo_ext_pass.php',
     'member_handler' => 'registries/pos_registry_member_pass.php',
 ];
 
@@ -66,22 +66,22 @@ try {
     }
 
     // 按顺序加载
-    require_once realpath(__DIR__ . '/../../../pos_backend/core/config.php');
+    require_once __DIR__ . '/../../src/pos/Config/config.php';
     echo "  ✓ config.php\n";
 
-    require_once realpath(__DIR__ . '/../../../pos_backend/helpers/pos_json_helper.php');
+    require_once __DIR__ . '/../../src/pos/Helpers/pos_json_helper.php';
     echo "  ✓ pos_json_helper.php\n";
 
-    require_once realpath(__DIR__ . '/../../../pos_backend/helpers/pos_datetime_helper.php');
+    require_once __DIR__ . '/../../src/pos/Helpers/pos_datetime_helper.php';
     echo "  ✓ pos_datetime_helper.php\n";
 
-    require_once realpath(__DIR__ . '/../../../pos_backend/helpers/pos_helper.php');
+    require_once __DIR__ . '/../../src/pos/Helpers/pos_helper.php';
     echo "  ✓ pos_helper.php\n";
 
-    require_once realpath(__DIR__ . '/../../../pos_backend/helpers/pos_repo.php');
+    require_once __DIR__ . '/../../src/pos/Helpers/pos_repo.php';
     echo "  ✓ pos_repo.php\n";
 
-    require_once realpath(__DIR__ . '/../../../pos_backend/helpers/pos_repo_ext_pass.php');
+    require_once __DIR__ . '/../../src/pos/Helpers/pos_repo_ext_pass.php';
     echo "  ✓ pos_repo_ext_pass.php\n";
 
     require_once __DIR__ . '/registries/pos_registry_member_pass.php';

@@ -12,10 +12,10 @@
 
 declare(strict_types=1);
 
-// 1) 核心
-require_once realpath(__DIR__ . '/../../../pos_backend/core/config.php');
-require_once realpath(__DIR__ . '/../../../pos_backend/helpers/pos_json_helper.php');
-require_once realpath(__DIR__ . '/../../../pos_backend/core/pos_api_core.php');
+// 1) 核心 - 使用新架构路径
+require_once __DIR__ . '/../../src/pos/Config/config.php';
+require_once __DIR__ . '/../../src/pos/Helpers/pos_json_helper.php';
+require_once __DIR__ . '/../../src/pos/Core/pos_api_core.php';
 
 // 2) 注册表
 $registry_main      = require __DIR__ . '/registries/pos_registry.php';

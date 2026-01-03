@@ -300,4 +300,73 @@ class SessionManager
         self::start();
         $_SESSION = [];
     }
+
+    // ========================================================================
+    // Authentication Helper Methods (for AuthGuard compatibility)
+    // ========================================================================
+
+    /**
+     * Initialize session (alias for start() for KDS compatibility)
+     *
+     * @return void
+     */
+    public static function init(): void
+    {
+        self::start();
+    }
+
+    /**
+     * Check if user is logged in
+     *
+     * @return bool
+     */
+    public static function isLoggedIn(): bool
+    {
+        self::start();
+        return isset($_SESSION['pos_logged_in']) && $_SESSION['pos_logged_in'] === true;
+    }
+
+    /**
+     * Get current user ID
+     *
+     * @return int|null
+     */
+    public static function getUserId(): ?int
+    {
+        self::start();
+        return isset($_SESSION['pos_user_id']) ? (int)$_SESSION['pos_user_id'] : null;
+    }
+
+    /**
+     * Get current user role
+     *
+     * @return string|null
+     */
+    public static function getUserRole(): ?string
+    {
+        self::start();
+        return $_SESSION['pos_user_role'] ?? null;
+    }
+
+    /**
+     * Get current store ID
+     *
+     * @return int|null
+     */
+    public static function getStoreId(): ?int
+    {
+        self::start();
+        return isset($_SESSION['pos_store_id']) ? (int)$_SESSION['pos_store_id'] : null;
+    }
+
+    /**
+     * Get current shift ID
+     *
+     * @return int|null
+     */
+    public static function getShiftId(): ?int
+    {
+        self::start();
+        return isset($_SESSION['pos_shift_id']) ? (int)$_SESSION['pos_shift_id'] : null;
+    }
 }

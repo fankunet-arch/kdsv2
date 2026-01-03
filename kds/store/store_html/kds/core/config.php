@@ -16,10 +16,10 @@ error_reporting(E_ALL);
 mb_internal_encoding('UTF-8');
 
 // --- Database Configuration (Copied from HQ) ---
-$db_host = 'mhdlmskvtmwsnt5z.mysql.db';
-$db_name = 'mhdlmskvtmwsnt5z';
-$db_user = 'mhdlmskvtmwsnt5z';
-$db_pass = 'p8PQF7M8ZKLVxtjvatMkrthFQQUB9';
+$db_host = 'mhdlmskv3gjbpqv3.mysql.db';
+$db_name = 'mhdlmskv3gjbpqv3';
+$db_user = 'mhdlmskv3gjbpqv3';
+$db_pass = 'zqVdVfAWYYaa4gTAuHWX7CngpRDqR';
 $db_char = 'utf8mb4';
 
 // --- Application Settings ---

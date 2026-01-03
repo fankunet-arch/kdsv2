@@ -9,18 +9,31 @@
     <link rel="stylesheet" href="css/kds_login.css?v=<?php echo time(); ?>">
 </head>
 <body>
+    <?php
+    // [FIX] Load CSRF helper
+    require_once realpath(__DIR__ . '/../../../helpers/csrf_helper.php');
+    ?>
     <div class="login-container">
         <div class="login-box">
             <h2 class="text-center mb-1">TOPTEA</h2>
             <h5 class="text-center text-white-50 mb-4" data-i18n-key="title_sub">制茶助手</h5>
-            
-            <?php if (isset($_GET['error'])): ?>
-                <div class="alert alert-danger" role="alert" data-i18n-key="error_invalid_credentials">
-                    无效的用户名、密码或门店码。
+
+            <?php
+            $error = $_GET['error'] ?? null;
+            if ($error): ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php if ($error === 'csrf'): ?>
+                        <span data-i18n-key="error_csrf">安全验证失败，请刷新页面重试。</span>
+                    <?php elseif ($error === 'rate_limit'): ?>
+                        <span data-i18n-key="error_rate_limit">登录尝试过多，请15分钟后再试。</span>
+                    <?php else: ?>
+                        <span data-i18n-key="error_invalid_credentials">无效的用户名、密码或门店码。</span>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 
             <form action="api/kds_login_handler.php" method="POST">
+                <?php echo csrfTokenField(); /* [FIX] CSRF Protection */ ?>
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="store_code" name="store_code" placeholder="门店码" required>
                     <label for="store_code" data-i18n-key="label_store_code">门店码</label>

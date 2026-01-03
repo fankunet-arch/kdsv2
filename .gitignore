@@ -1,0 +1,30 @@
+# Environment Configuration
+.env
+
+# Logs
+*.log
+/var/log/kds/
+src/kds/Core/php_errors*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Composer (if used in future)
+/vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+
+# Backup files
+*.bak
+*.backup
+*.old
